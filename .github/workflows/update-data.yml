@@ -1,10 +1,10 @@
 name: Update IPI Data
 
 on:
-  # Se dispara automáticamente cuando se sube un nuevo ipi_man.xls al repositorio
+  # Se dispara automáticamente cuando se sube un nuevo ipi_man.xlsx al repositorio
   push:
     paths:
-      - 'my-ipi-dashboard/data/raw/ipi_man.xls'
+      - 'my-ipi-dashboard/data/raw/ipi_man.xlsx'
   # También se puede disparar manualmente desde GitHub Actions
   workflow_dispatch:
 
@@ -20,12 +20,12 @@ jobs:
       - name: Verificar que ipi_man.xls existe en el repositorio
         working-directory: my-ipi-dashboard
         run: |
-          if [ ! -f "data/raw/ipi_man.xls" ]; then
-            echo "ERROR: No se encontró data/raw/ipi_man.xls"
+          if [ ! -f "data/raw/ipi_man.xlsx" ]; then
+            echo "ERROR: No se encontró data/raw/ipi_man.xlsx"
             echo "Subí el archivo manualmente al repositorio antes de ejecutar este workflow."
             exit 1
           fi
-          echo "✓ Archivo encontrado: $(ls -lh data/raw/ipi_man.xls)"
+          echo "✓ Archivo encontrado: $(ls -lh data/raw/ipi_man.xlsx)"
 
       - name: Setup Python
         uses: actions/setup-python@v5

@@ -89,7 +89,7 @@ export default function IpiEvolucionSectoralChart({ data }: Props) {
             ))}
           </select>
           <button
-            onClick={() => setSeriesVisibles(new Set(sectores))}
+            onClick={() => setSeriesVisibles(new Set())}
             className="bg-transparent border border-slate-200 rounded-md text-slate-500 px-3 py-1 text-xs cursor-pointer font-semibold hover:border-blue-400 hover:text-blue-500 transition-colors"
           >
             LIMPIAR
@@ -103,7 +103,7 @@ export default function IpiEvolucionSectoralChart({ data }: Props) {
           const visible = seriesVisibles.has(s);
           return (
             <button key={s}
-              onClick={() => setSeriesVisibles((prev) => { const next = new Set(prev); if (next.has(s)) { if (next.size > 1) next.delete(s); } else next.add(s); return next; })}
+              onClick={() => setSeriesVisibles((prev) => { const next = new Set(prev); if (next.has(s)) { next.delete(s); } else next.add(s); return next; })}
               style={{ padding: '2px 8px', borderRadius: 20, border: `1px solid ${visible ? color : '#e2e8f0'}`, background: visible ? `${color}22` : 'transparent', color: visible ? color : '#94a3b8', fontSize: 10, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: visible ? color : '#cbd5e1', display: 'inline-block' }} />
               {SECTOR_NOMBRES_CORTOS[s] ?? s}

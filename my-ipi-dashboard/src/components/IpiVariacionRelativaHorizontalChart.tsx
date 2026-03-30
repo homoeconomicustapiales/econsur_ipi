@@ -23,6 +23,10 @@ interface Props {
   data: IpiCuadro2;
 }
 
+const IPI_KEY = 'ipiManufacturero';
+const IPI_FILL = '#2563eb';
+const IPI_TEXT = '#1d4ed8';
+
 const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 function formatFechaOpt(f: string): string {
   const [y, m] = f.split('-').map(Number);
@@ -83,20 +87,30 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
 
   const CustomAxisTick = ({ x, y, payload }: any) => {
     const label = payload.value.length > 28 ? payload.value.slice(0, 26) + '…' : payload.value;
+    const isIpiManufacturero = payload.value === SECTOR_NOMBRES_COMPLETOS[IPI_KEY];
     return (
       <g transform={`translate(${x},${y})`}>
-        <text x={-6} y={0} dy={4} textAnchor="end" fill="#64748b" fontSize={10}>
+        <text
+          x={-6}
+          y={0}
+          dy={4}
+          textAnchor="end"
+          fill={isIpiManufacturero ? IPI_TEXT : '#64748b'}
+          fontSize={isIpiManufacturero ? 11 : 10}
+          fontWeight={isIpiManufacturero ? 700 : 400}
+        >
           {label}
         </text>
       </g>
     );
   };
 
-  const CustomBarLabel = ({ x, y, width, height, value }: any) => {
+  const CustomBarLabel = ({ x, y, width, height, value, index }: any) => {
     if (typeof value !== 'number' || Number.isNaN(value)) return null;
 
     const isPositive = value >= 0;
     const labelX = isPositive ? x + width + 6 : x - 6;
+    const isIpiManufacturero = chartData[index]?.sectorKey === IPI_KEY;
 
     return (
       <text
@@ -104,8 +118,8 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
         y={y + height / 2}
         dy={4}
         textAnchor={isPositive ? 'start' : 'end'}
-        fill={isPositive ? '#16a34a' : '#dc2626'}
-        fontSize={11}
+        fill={isIpiManufacturero ? IPI_TEXT : isPositive ? '#16a34a' : '#dc2626'}
+        fontSize={isIpiManufacturero ? 12 : 11}
         fontWeight={700}
       >
         {formatVariacionEntera(value)}
@@ -189,8 +203,10 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
             {chartData.map((entry, index) => (
               <Cell
                 key={index}
-                fill={entry.variacion >= 0 ? '#22c55e' : '#ef4444'}
-                fillOpacity={0.85}
+                fill={entry.sectorKey === IPI_KEY ? IPI_FILL : entry.variacion >= 0 ? '#22c55e' : '#ef4444'}
+                fillOpacity={entry.sectorKey === IPI_KEY ? 1 : 0.85}
+                stroke={entry.sectorKey === IPI_KEY ? '#1e40af' : 'none'}
+                strokeWidth={entry.sectorKey === IPI_KEY ? 1.5 : 0}
               />
             ))}
             <LabelList dataKey="variacion" content={<CustomBarLabel />} />

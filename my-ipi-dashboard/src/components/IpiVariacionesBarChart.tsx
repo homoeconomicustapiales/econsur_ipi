@@ -21,6 +21,7 @@ import {
 import AxisScaleSelector from './Shared/AxisScaleSelector';
 import type { IpiCuadro2 } from '@/types/ipi';
 import { SECTOR_NOMBRES_CORTOS } from '@/utils/constants';
+import { Card } from '@tremor/react';
 
 interface Props {
   data: IpiCuadro2;
@@ -74,8 +75,8 @@ export default function IpiVariacionesBarChart({ data }: Props) {
     if (!active || !payload?.length) return null;
     const v = payload[0].value;
     return (
-      <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
-        <p style={{ color: '#94a3b8', marginBottom: 4, fontWeight: 600 }}>{label}</p>
+      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', fontSize: 12, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.07)' }}>
+        <p style={{ color: '#64748b', marginBottom: 4, fontWeight: 600 }}>{label}</p>
         <p style={{ color: v >= 0 ? '#22c55e' : '#ef4444', fontWeight: 700 }}>
           {tipoVar === 'mensual' ? 'Var. Mensual' : 'Var. Interanual'}: {formatVariacion(v)}
         </p>
@@ -84,31 +85,31 @@ export default function IpiVariacionesBarChart({ data }: Props) {
   };
 
   return (
-    <div style={{ background: '#1e293b', borderRadius: 12, border: '1px solid #334155', padding: '20px 24px' }}>
+    <Card className="p-5">
       <div className="mb-4">
-        <h2 style={{ fontSize: 15, fontWeight: 700, color: '#f1f5f9', marginBottom: 2 }}>
+        <h2 className="text-sm font-bold text-slate-800 mb-0.5">
           Variaciones por Sector
         </h2>
-        <p style={{ fontSize: 12, color: '#64748b', marginBottom: 12 }}>
+        <p className="text-xs text-slate-500 mb-3">
           Variaciones mensuales e interanuales · IPI Manufacturero
         </p>
 
         <div className="flex flex-wrap gap-3 mb-3">
           {/* Rango */}
-          <div style={{ display: 'flex', background: '#0f172a', borderRadius: 6, border: '1px solid #334155', overflow: 'hidden' }}>
+          <div className="flex bg-slate-100 rounded-md border border-slate-200 overflow-hidden">
             {RANGOS.map((r) => (
               <button key={r.label} onClick={() => setRango(r.label)}
-                style={{ padding: '4px 10px', fontSize: 11, fontWeight: 600, background: rango === r.label ? '#3b82f6' : 'transparent', color: rango === r.label ? '#fff' : '#64748b', border: 'none', cursor: 'pointer' }}>
+                className={`px-2.5 py-1 text-xs font-semibold border-none cursor-pointer ${rango === r.label ? 'bg-blue-500 text-white' : 'bg-transparent text-slate-500'}`}>
                 {r.label}
               </button>
             ))}
           </div>
 
           {/* Tipo variación */}
-          <div style={{ display: 'flex', background: '#0f172a', borderRadius: 6, border: '1px solid #334155', overflow: 'hidden' }}>
+          <div className="flex bg-slate-100 rounded-md border border-slate-200 overflow-hidden">
             {(['mensual', 'interanual'] as TipoVar[]).map((t) => (
               <button key={t} onClick={() => setTipoVar(t)}
-                style={{ padding: '4px 12px', fontSize: 11, fontWeight: 600, background: tipoVar === t ? '#3b82f6' : 'transparent', color: tipoVar === t ? '#fff' : '#64748b', border: 'none', cursor: 'pointer' }}>
+                className={`px-3 py-1 text-xs font-semibold border-none cursor-pointer ${tipoVar === t ? 'bg-blue-500 text-white' : 'bg-transparent text-slate-500'}`}>
                 {t === 'mensual' ? 'Mensual' : 'Interanual'}
               </button>
             ))}
@@ -123,9 +124,9 @@ export default function IpiVariacionesBarChart({ data }: Props) {
             <button key={s} onClick={() => setSectorActivo(s)}
               style={{
                 padding: '3px 10px', borderRadius: 20, fontSize: 10, fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s',
-                border: `1px solid ${sectorActivo === s ? '#3b82f6' : '#334155'}`,
-                background: sectorActivo === s ? '#3b82f620' : 'transparent',
-                color: sectorActivo === s ? '#3b82f6' : '#64748b',
+                border: `1px solid ${sectorActivo === s ? '#3b82f6' : '#e2e8f0'}`,
+                background: sectorActivo === s ? '#eff6ff' : 'transparent',
+                color: sectorActivo === s ? '#3b82f6' : '#94a3b8',
               }}>
               {SECTOR_NOMBRES_CORTOS[s] ?? s}
             </button>
@@ -135,7 +136,7 @@ export default function IpiVariacionesBarChart({ data }: Props) {
 
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e3a5f" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis dataKey="label" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
           <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} width={50} domain={yDomain} tickFormatter={(v) => `${v}%`} />
           <Tooltip content={<CustomTooltip />} />
@@ -147,6 +148,6 @@ export default function IpiVariacionesBarChart({ data }: Props) {
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-    </div>
+    </Card>
   );
 }

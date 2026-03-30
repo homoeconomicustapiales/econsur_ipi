@@ -14,6 +14,7 @@ import { formatFechaCorta, formatIndice } from '@/utils/formatters';
 import { rebaseASerie } from '@/utils/calculations';
 import type { IpiCuadro2 } from '@/types/ipi';
 import { SECTOR_COLORS, SECTOR_NOMBRES_CORTOS } from '@/utils/constants';
+import { Card } from '@tremor/react';
 
 interface Props {
   data: IpiCuadro2;
@@ -47,34 +48,34 @@ export default function IpiEvolucionSectoralChart({ data }: Props) {
     if (!active || !payload?.length) return null;
     const visible = payload.filter((p: any) => p.value !== null).slice(0, 6);
     return (
-      <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 8, padding: '10px 14px', fontSize: 11, maxWidth: 210 }}>
-        <p style={{ color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>{label}</p>
+      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', fontSize: 11, maxWidth: 210, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.07)' }}>
+        <p style={{ color: '#64748b', marginBottom: 6, fontWeight: 600 }}>{label}</p>
         {visible.map((entry: any) => (
           <div key={entry.dataKey} style={{ color: entry.stroke, marginBottom: 2 }}>
-            <span style={{ color: '#94a3b8' }}>{SECTOR_NOMBRES_CORTOS[entry.dataKey] ?? entry.dataKey}:</span>{' '}
+            <span style={{ color: '#64748b' }}>{SECTOR_NOMBRES_CORTOS[entry.dataKey] ?? entry.dataKey}:</span>{' '}
             <strong>{formatIndice(entry.value)}</strong>
           </div>
         ))}
-        {payload.length > 6 && <p style={{ color: '#64748b', marginTop: 4 }}>+{payload.length - 6} más…</p>}
+        {payload.length > 6 && <p style={{ color: '#94a3b8', marginTop: 4 }}>+{payload.length - 6} más…</p>}
       </div>
     );
   };
 
   return (
-    <div style={{ background: '#1e293b', borderRadius: 12, border: '1px solid #334155', padding: '20px 24px' }}>
+    <Card className="p-5">
       <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
         <div>
-          <h2 style={{ fontSize: 15, fontWeight: 700, color: '#f1f5f9', marginBottom: 2 }}>
+          <h2 className="text-sm font-bold text-slate-800 mb-0.5">
             Evolución Sectorial (Base 100)
           </h2>
-          <p style={{ fontSize: 12, color: '#64748b' }}>Evolución relativa normalizada por sector</p>
+          <p className="text-xs text-slate-500">Evolución relativa normalizada por sector</p>
         </div>
         <div className="flex items-center gap-2">
-          <span style={{ fontSize: 12, color: '#94a3b8' }}>Fecha base:</span>
+          <span className="text-xs text-slate-500">Fecha base:</span>
           <select
             value={fechaBase}
             onChange={(e) => setFechaBase(e.target.value)}
-            style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 6, color: '#f1f5f9', padding: '5px 10px', fontSize: 12, cursor: 'pointer', outline: 'none' }}
+            className="bg-white border border-slate-200 rounded-md text-slate-700 px-2 py-1 text-xs cursor-pointer outline-none"
           >
             {todasFechas.map((f) => (
               <option key={f} value={f}>{formatFechaOpt(f)}</option>
@@ -90,8 +91,8 @@ export default function IpiEvolucionSectoralChart({ data }: Props) {
           return (
             <button key={s}
               onClick={() => setSeriesVisibles((prev) => { const next = new Set(prev); if (next.has(s)) { if (next.size > 1) next.delete(s); } else next.add(s); return next; })}
-              style={{ padding: '2px 8px', borderRadius: 20, border: `1px solid ${visible ? color : '#334155'}`, background: visible ? `${color}22` : 'transparent', color: visible ? color : '#64748b', fontSize: 10, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: visible ? color : '#334155', display: 'inline-block' }} />
+              style={{ padding: '2px 8px', borderRadius: 20, border: `1px solid ${visible ? color : '#e2e8f0'}`, background: visible ? `${color}22` : 'transparent', color: visible ? color : '#94a3b8', fontSize: 10, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: visible ? color : '#cbd5e1', display: 'inline-block' }} />
               {SECTOR_NOMBRES_CORTOS[s] ?? s}
             </button>
           );
@@ -111,7 +112,7 @@ export default function IpiEvolucionSectoralChart({ data }: Props) {
               );
             })}
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e3a5f" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis dataKey="label" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
           <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} width={50} tickFormatter={(v) => formatIndice(v)} />
           <Tooltip content={<CustomTooltip />} />
@@ -124,6 +125,6 @@ export default function IpiEvolucionSectoralChart({ data }: Props) {
           })}
         </AreaChart>
       </ResponsiveContainer>
-    </div>
+    </Card>
   );
 }

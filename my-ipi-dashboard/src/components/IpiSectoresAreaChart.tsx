@@ -10,6 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { Card } from '@tremor/react';
 import DateRangeFilter from './Shared/DateRangeFilter';
 import AxisScaleSelector from './Shared/AxisScaleSelector';
 import { formatFechaCorta, formatIndice } from '@/utils/formatters';
@@ -65,46 +66,36 @@ export default function IpiSectoresAreaChart({ data }: Props) {
     return (
       <div
         style={{
-          background: '#1e293b',
-          border: '1px solid #334155',
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
           borderRadius: 8,
           padding: '10px 14px',
           fontSize: 11,
           maxWidth: 220,
+          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.07)',
         }}
       >
-        <p style={{ color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>{label}</p>
+        <p style={{ color: '#64748b', marginBottom: 6, fontWeight: 600 }}>{label}</p>
         {visible.map((entry: any) => (
           <div key={entry.dataKey} style={{ color: entry.stroke, marginBottom: 2 }}>
-            <span style={{ color: '#94a3b8' }}>
+            <span style={{ color: '#64748b' }}>
               {SECTOR_NOMBRES_CORTOS[entry.dataKey] ?? entry.dataKey}:
             </span>{' '}
             <strong>{formatIndice(entry.value)}</strong>
           </div>
         ))}
         {payload.length > 8 && (
-          <p style={{ color: '#64748b', marginTop: 4 }}>+{payload.length - 8} más…</p>
+          <p style={{ color: '#94a3b8', marginTop: 4 }}>+{payload.length - 8} más…</p>
         )}
       </div>
     );
   };
 
   return (
-    <div
-      style={{
-        background: '#1e293b',
-        borderRadius: 12,
-        border: '1px solid #334155',
-        padding: '20px 24px',
-      }}
-    >
+    <Card className="p-5">
       <div className="mb-4">
-        <h2 style={{ fontSize: 15, fontWeight: 700, color: '#f1f5f9', marginBottom: 2 }}>
-          Sectores Manufactureros · Cuadro 2
-        </h2>
-        <p style={{ fontSize: 12, color: '#64748b', marginBottom: 12 }}>
-          17 sectores · Índice Base 2004=100
-        </p>
+        <h2 className="text-sm font-bold text-slate-800 mb-0.5">Sectores Manufactureros · Cuadro 2</h2>
+        <p className="text-xs text-slate-500 mb-3">17 sectores · Índice Base 2004=100</p>
         <div className="flex flex-wrap gap-3">
           <DateRangeFilter
             fechas={todasFechas}
@@ -112,7 +103,10 @@ export default function IpiSectoresAreaChart({ data }: Props) {
             hasta={hasta}
             onDesdeChange={setDesde}
             onHastaChange={setHasta}
-            onLimpiar={() => { setDesde(primeraFecha); setHasta(ultimaFecha); }}
+            onLimpiar={() => {
+              setDesde(primeraFecha);
+              setHasta(ultimaFecha);
+            }}
           />
           <AxisScaleSelector
             value={scaleMode}
@@ -125,7 +119,6 @@ export default function IpiSectoresAreaChart({ data }: Props) {
         </div>
       </div>
 
-      {/* Series toggles */}
       <div className="flex flex-wrap gap-2 mb-4">
         {sectores.map((s, i) => {
           const color = SECTOR_COLORS[i % SECTOR_COLORS.length];
@@ -136,17 +129,20 @@ export default function IpiSectoresAreaChart({ data }: Props) {
               onClick={() => {
                 setSeriesVisibles((prev) => {
                   const next = new Set(prev);
-                  if (next.has(s)) { if (next.size > 1) next.delete(s); }
-                  else next.add(s);
+                  if (next.has(s)) {
+                    if (next.size > 1) next.delete(s);
+                  } else {
+                    next.add(s);
+                  }
                   return next;
                 });
               }}
               style={{
                 padding: '2px 8px',
                 borderRadius: 20,
-                border: `1px solid ${visible ? color : '#334155'}`,
+                border: `1px solid ${visible ? color : '#e2e8f0'}`,
                 background: visible ? `${color}22` : 'transparent',
-                color: visible ? color : '#64748b',
+                color: visible ? color : '#94a3b8',
                 fontSize: 10,
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -156,7 +152,15 @@ export default function IpiSectoresAreaChart({ data }: Props) {
                 gap: 4,
               }}
             >
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: visible ? color : '#334155', display: 'inline-block' }} />
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  background: visible ? color : '#cbd5e1',
+                  display: 'inline-block',
+                }}
+              />
               {SECTOR_NOMBRES_CORTOS[s] ?? s}
             </button>
           );
@@ -176,11 +180,11 @@ export default function IpiSectoresAreaChart({ data }: Props) {
               );
             })}
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e3a5f" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis dataKey="label" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
           <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} width={50} domain={yDomain} tickFormatter={(v) => formatIndice(v)} />
           <Tooltip content={<CustomTooltip />} />
-          {sectores.filter((s) => seriesVisibles.has(s)).map((s, i) => {
+          {sectores.filter((s) => seriesVisibles.has(s)).map((s) => {
             const color = SECTOR_COLORS[sectores.indexOf(s) % SECTOR_COLORS.length];
             return (
               <Area key={s} type="monotone" dataKey={s} stroke={color} strokeWidth={2} fill={`url(#grad2-${sectores.indexOf(s)})`} dot={false} activeDot={{ r: 3, fill: color }} connectNulls />
@@ -188,6 +192,6 @@ export default function IpiSectoresAreaChart({ data }: Props) {
           })}
         </AreaChart>
       </ResponsiveContainer>
-    </div>
+    </Card>
   );
 }

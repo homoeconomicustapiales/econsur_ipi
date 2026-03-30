@@ -16,6 +16,7 @@ import { formatVariacion } from '@/utils/formatters';
 import { calcVariacionRelativaPorSector } from '@/utils/calculations';
 import type { IpiCuadro2 } from '@/types/ipi';
 import { SECTOR_NOMBRES_COMPLETOS } from '@/utils/constants';
+import { Card } from '@tremor/react';
 
 interface Props {
   data: IpiCuadro2;
@@ -37,12 +38,12 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
   const [hasta, setHasta] = useState(ultimaFecha);
 
   const selectStyle: React.CSSProperties = {
-    background: '#0f172a',
-    border: '1px solid #334155',
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
     borderRadius: 6,
-    color: '#f1f5f9',
+    color: '#334155',
     padding: '5px 10px',
-    fontSize: 13,
+    fontSize: 12,
     cursor: 'pointer',
     outline: 'none',
     minWidth: 110,
@@ -61,12 +62,12 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
     const v = payload[0].value;
     const nombre = payload[0].payload.sector;
     return (
-      <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 8, padding: '10px 14px', fontSize: 12, maxWidth: 240 }}>
-        <p style={{ color: '#f1f5f9', marginBottom: 4, fontWeight: 600, fontSize: 11 }}>{nombre}</p>
+      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', fontSize: 12, maxWidth: 240, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.07)' }}>
+        <p style={{ color: '#1e293b', marginBottom: 4, fontWeight: 600, fontSize: 11 }}>{nombre}</p>
         <p style={{ color: v >= 0 ? '#22c55e' : '#ef4444', fontWeight: 700, fontSize: 14 }}>
           {formatVariacion(v)}
         </p>
-        <p style={{ color: '#64748b', fontSize: 10, marginTop: 2 }}>
+        <p style={{ color: '#94a3b8', fontSize: 10, marginTop: 2 }}>
           {formatFechaOpt(desde)} → {formatFechaOpt(hasta)}
         </p>
       </div>
@@ -77,7 +78,7 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
     const label = payload.value.length > 28 ? payload.value.slice(0, 26) + '…' : payload.value;
     return (
       <g transform={`translate(${x},${y})`}>
-        <text x={-6} y={0} dy={4} textAnchor="end" fill="#94a3b8" fontSize={10}>
+        <text x={-6} y={0} dy={4} textAnchor="end" fill="#64748b" fontSize={10}>
           {label}
         </text>
       </g>
@@ -85,18 +86,18 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
   };
 
   return (
-    <div style={{ background: '#1e293b', borderRadius: 12, border: '1px solid #334155', padding: '20px 24px' }}>
+    <Card className="p-5">
       <div className="mb-4">
-        <h2 style={{ fontSize: 15, fontWeight: 700, color: '#f1f5f9', marginBottom: 2 }}>
+        <h2 className="text-sm font-bold text-slate-800 mb-0.5">
           Variación Relativa por Fechas
         </h2>
-        <p style={{ fontSize: 12, color: '#64748b', marginBottom: 12 }}>
+        <p className="text-xs text-slate-500 mb-3">
           Comparativa de crecimiento sectorial en el período seleccionado
         </p>
 
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <span style={{ fontSize: 12, color: '#94a3b8' }}>Desde:</span>
+            <span className="text-xs text-slate-500">Desde:</span>
             <select value={desde} onChange={(e) => setDesde(e.target.value)} style={selectStyle}>
               {todasFechas.map((f) => (
                 <option key={f} value={f}>{formatFechaOpt(f)}</option>
@@ -104,7 +105,7 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span style={{ fontSize: 12, color: '#94a3b8' }}>Hasta:</span>
+            <span className="text-xs text-slate-500">Hasta:</span>
             <select value={hasta} onChange={(e) => setHasta(e.target.value)} style={selectStyle}>
               {todasFechas.map((f) => (
                 <option key={f} value={f}>{formatFechaOpt(f)}</option>
@@ -113,9 +114,7 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
           </div>
           <button
             onClick={() => { setDesde(primeraFecha); setHasta(ultimaFecha); }}
-            style={{ background: 'transparent', border: '1px solid #334155', borderRadius: 6, color: '#94a3b8', padding: '5px 12px', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}
-            onMouseEnter={(e) => { (e.target as HTMLButtonElement).style.borderColor = '#3b82f6'; (e.target as HTMLButtonElement).style.color = '#3b82f6'; }}
-            onMouseLeave={(e) => { (e.target as HTMLButtonElement).style.borderColor = '#334155'; (e.target as HTMLButtonElement).style.color = '#94a3b8'; }}
+            className="bg-transparent border border-slate-200 rounded-md text-slate-500 px-3 py-1 text-xs cursor-pointer font-semibold hover:border-blue-400 hover:text-blue-500 transition-colors"
           >
             LIMPIAR
           </button>
@@ -126,11 +125,11 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
       <div className="flex gap-4 mb-3">
         <div className="flex items-center gap-2">
           <span style={{ width: 12, height: 12, borderRadius: 2, background: '#22c55e', display: 'inline-block' }} />
-          <span style={{ fontSize: 11, color: '#64748b' }}>Crecimiento (+)</span>
+          <span className="text-xs text-slate-500">Crecimiento (+)</span>
         </div>
         <div className="flex items-center gap-2">
           <span style={{ width: 12, height: 12, borderRadius: 2, background: '#ef4444', display: 'inline-block' }} />
-          <span style={{ fontSize: 11, color: '#64748b' }}>Decrecimiento (−)</span>
+          <span className="text-xs text-slate-500">Decrecimiento (−)</span>
         </div>
       </div>
 
@@ -140,10 +139,10 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
           layout="vertical"
           margin={{ top: 5, right: 40, bottom: 5, left: 160 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e3a5f" horizontal={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
           <XAxis
             type="number"
-            tick={{ fill: '#64748b', fontSize: 11 }}
+           tick={{ fill: '#94a3b8', fontSize: 11 }}
             axisLine={false}
             tickLine={false}
             tickFormatter={(v) => `${v}%`}
@@ -169,6 +168,6 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-    </div>
+    </Card>
   );
 }

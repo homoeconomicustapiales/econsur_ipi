@@ -29,12 +29,12 @@ export default function DateRangeFilter({
   label = 'Período',
 }: DateRangeFilterProps) {
   const selectStyle: React.CSSProperties = {
-    background: '#0f172a',
-    border: '1px solid #334155',
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
     borderRadius: 6,
-    color: '#f1f5f9',
+    color: '#334155',
     padding: '5px 10px',
-    fontSize: 13,
+    fontSize: 12,
     cursor: 'pointer',
     outline: 'none',
     minWidth: 110,
@@ -42,9 +42,9 @@ export default function DateRangeFilter({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500 }}>{label}:</span>
+      <span className="text-xs text-slate-500 font-medium">{label}:</span>
       <div className="flex items-center gap-1">
-        <span style={{ fontSize: 12, color: '#64748b' }}>Desde:</span>
+        <span className="text-xs text-slate-400">Desde:</span>
         <select value={desde} onChange={(e) => onDesdeChange(e.target.value)} style={selectStyle}>
           {fechas.map((f) => (
             <option key={f} value={f}>
@@ -54,7 +54,7 @@ export default function DateRangeFilter({
         </select>
       </div>
       <div className="flex items-center gap-1">
-        <span style={{ fontSize: 12, color: '#64748b' }}>Hasta:</span>
+        <span className="text-xs text-slate-400">Hasta:</span>
         <select value={hasta} onChange={(e) => onHastaChange(e.target.value)} style={selectStyle}>
           {fechas.map((f) => (
             <option key={f} value={f}>
@@ -65,26 +65,7 @@ export default function DateRangeFilter({
       </div>
       <button
         onClick={onLimpiar}
-        style={{
-          background: 'transparent',
-          border: '1px solid #334155',
-          borderRadius: 6,
-          color: '#94a3b8',
-          padding: '5px 12px',
-          fontSize: 12,
-          cursor: 'pointer',
-          fontWeight: 600,
-          letterSpacing: '0.05em',
-          transition: 'all 0.15s',
-        }}
-        onMouseEnter={(e) => {
-          (e.target as HTMLButtonElement).style.borderColor = '#3b82f6';
-          (e.target as HTMLButtonElement).style.color = '#3b82f6';
-        }}
-        onMouseLeave={(e) => {
-          (e.target as HTMLButtonElement).style.borderColor = '#334155';
-          (e.target as HTMLButtonElement).style.color = '#94a3b8';
-        }}
+        className="bg-transparent border border-slate-200 rounded-md text-slate-400 px-3 py-1 text-xs cursor-pointer font-semibold tracking-wide hover:border-blue-400 hover:text-blue-500 transition-colors"
       >
         LIMPIAR
       </button>

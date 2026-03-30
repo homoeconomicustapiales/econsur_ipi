@@ -20,12 +20,12 @@ export default function AxisScaleSelector({
   onYMaxChange,
 }: AxisScaleSelectorProps) {
   const selectStyle: React.CSSProperties = {
-    background: '#0f172a',
-    border: '1px solid #334155',
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
     borderRadius: 6,
-    color: '#f1f5f9',
+    color: '#334155',
     padding: '5px 10px',
-    fontSize: 13,
+    fontSize: 12,
     cursor: 'pointer',
     outline: 'none',
   };
@@ -37,7 +37,7 @@ export default function AxisScaleSelector({
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500 }}>Escala Y:</span>
+      <span className="text-xs text-slate-500 font-medium">Escala Y:</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value as 'auto' | 'manual')}

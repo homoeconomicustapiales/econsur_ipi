@@ -14,6 +14,7 @@ import {
 import { formatFechaCorta, formatIndice } from '@/utils/formatters';
 import { filterByDateRange } from '@/utils/calculations';
 import type { IpiCuadro1 } from '@/types/ipi';
+import { Card } from '@tremor/react';
 
 interface Props {
   data: IpiCuadro1;
@@ -85,17 +86,18 @@ export default function IpiSeriesAreaChart({ data }: Props) {
     return (
       <div
         style={{
-          background: '#1e293b',
-          border: '1px solid #334155',
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
           borderRadius: 8,
           padding: '10px 14px',
           fontSize: 12,
+          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.07)',
         }}
       >
-        <p style={{ color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>{label}</p>
+        <p style={{ color: '#64748b', marginBottom: 6, fontWeight: 600 }}>{label}</p>
         {payload.map((entry: any) => (
           <div key={entry.dataKey} style={{ color: entry.color, marginBottom: 2 }}>
-            <span style={{ color: '#94a3b8' }}>
+            <span style={{ color: '#64748b' }}>
               {SERIES.find((s) => s.key === entry.dataKey)?.nombre}:
             </span>{' '}
             <strong>{formatIndice(entry.value)}</strong>
@@ -106,76 +108,40 @@ export default function IpiSeriesAreaChart({ data }: Props) {
   };
 
   return (
-    <div
-      style={{
-        background: '#1e293b',
-        borderRadius: 12,
-        border: '1px solid #334155',
-        padding: '20px 24px',
-      }}
-    >
+    <Card className="p-5">
       <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
         <div>
-          <h2 style={{ fontSize: 15, fontWeight: 700, color: '#f1f5f9', marginBottom: 2 }}>
+          <h2 className="text-sm font-bold text-slate-800 mb-0.5">
             Series Principales · Cuadro 1
           </h2>
-          <p style={{ fontSize: 12, color: '#64748b' }}>
+          <p className="text-xs text-slate-500">
             Índice Base 2004=100 · IPI Manufacturero
           </p>
         </div>
         <div className="flex flex-wrap gap-2 items-center">
           {/* Vista toggle */}
-          <div
-            style={{
-              display: 'flex',
-              background: '#0f172a',
-              borderRadius: 6,
-              border: '1px solid #334155',
-              overflow: 'hidden',
-            }}
-          >
+          <div className="flex bg-slate-100 rounded-md border border-slate-200 overflow-hidden">
             {(['niveles', 'interanual', 'mensual'] as VistaMode[]).map((m) => (
               <button
                 key={m}
                 onClick={() => setVistaMode(m)}
-                style={{
-                  padding: '4px 10px',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  background: vistaMode === m ? '#3b82f6' : 'transparent',
-                  color: vistaMode === m ? '#fff' : '#64748b',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textTransform: 'capitalize',
-                }}
+                className={`px-2.5 py-1 text-xs font-semibold border-none cursor-pointer capitalize ${
+                  vistaMode === m ? 'bg-blue-500 text-white' : 'bg-transparent text-slate-500'
+                }`}
               >
                 {m === 'niveles' ? 'Niveles' : m === 'interanual' ? 'Var. Interanual' : 'Var. Mensual'}
               </button>
             ))}
           </div>
           {/* Rango */}
-          <div
-            style={{
-              display: 'flex',
-              background: '#0f172a',
-              borderRadius: 6,
-              border: '1px solid #334155',
-              overflow: 'hidden',
-            }}
-          >
+          <div className="flex bg-slate-100 rounded-md border border-slate-200 overflow-hidden">
             {RANGOS.map((r) => (
               <button
                 key={r.label}
                 onClick={() => setRangoActivo(r.label)}
-                style={{
-                  padding: '4px 10px',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  background: rangoActivo === r.label ? '#3b82f6' : 'transparent',
-                  color: rangoActivo === r.label ? '#fff' : '#64748b',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
+                className={`px-2.5 py-1 text-xs font-semibold border-none cursor-pointer ${
+                  rangoActivo === r.label ? 'bg-blue-500 text-white' : 'bg-transparent text-slate-500'
+                }`}
               >
                 {r.label}
               </button>
@@ -196,9 +162,9 @@ export default function IpiSeriesAreaChart({ data }: Props) {
               gap: 6,
               padding: '3px 10px',
               borderRadius: 20,
-              border: `1px solid ${seriesVisibles.has(s.key) ? s.color : '#334155'}`,
+                border: `1px solid ${seriesVisibles.has(s.key) ? s.color : '#e2e8f0'}`,
               background: seriesVisibles.has(s.key) ? `${s.color}22` : 'transparent',
-              color: seriesVisibles.has(s.key) ? s.color : '#64748b',
+                color: seriesVisibles.has(s.key) ? s.color : '#94a3b8',
               fontSize: 11,
               fontWeight: 600,
               cursor: 'pointer',
@@ -210,7 +176,7 @@ export default function IpiSeriesAreaChart({ data }: Props) {
                 width: 8,
                 height: 8,
                 borderRadius: '50%',
-                background: seriesVisibles.has(s.key) ? s.color : '#334155',
+                  background: seriesVisibles.has(s.key) ? s.color : '#cbd5e1',
                 display: 'inline-block',
               }}
             />
@@ -229,7 +195,7 @@ export default function IpiSeriesAreaChart({ data }: Props) {
               </linearGradient>
             ))}
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e3a5f" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis
             dataKey="label"
             tick={{ fill: '#64748b', fontSize: 11 }}
@@ -260,6 +226,6 @@ export default function IpiSeriesAreaChart({ data }: Props) {
           ))}
         </AreaChart>
       </ResponsiveContainer>
-    </div>
+    </Card>
   );
 }

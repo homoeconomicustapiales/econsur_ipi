@@ -1,0 +1,12 @@
+# Node dependencies
+my-ipi-dashboard/node_modules/
+
+# Next.js build output
+my-ipi-dashboard/.next/
+my-ipi-dashboard/out/
+
+# Logs
+my-ipi-dashboard/npm-debug.log*
+my-ipi-dashboard/yarn-debug.log*
+my-ipi-dashboard/yarn-error.log*
+my-ipi-dashboard/pnpm-debug.log*

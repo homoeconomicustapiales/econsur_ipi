@@ -4,15 +4,17 @@ import React, { useState, useMemo } from 'react';
 import {
   AreaChart,
   Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
+  ReferenceLine,
   ResponsiveContainer,
 } from 'recharts';
-import { formatFechaCorta, formatIndice } from '@/utils/formatters';
-import { filterByDateRange } from '@/utils/calculations';
+import { formatFechaCorta, formatIndice, formatVariacion } from '@/utils/formatters';
+import { calcVariacionInteranual, calcVariacionMensual, filterByDateRange } from '@/utils/calculations';
 import type { IpiCuadro1 } from '@/types/ipi';
 import { Card } from '@tremor/react';
 
@@ -60,14 +62,57 @@ export default function IpiSeriesAreaChart({ data }: Props) {
     const de = filterByDateRange(data.desestacionalizada, desde, hasta);
     const tc = filterByDateRange(data.tendenciaCiclo, desde, hasta);
 
-    return ng.map((p, i) => ({
+    const seriesTransform =
+      vistaMode === 'mensual'
+        ? calcVariacionMensual
+        : vistaMode === 'interanual'
+        ? calcVariacionInteranual
+        : null;
+
+    const ngData = seriesTransform ? seriesTransform(ng) : ng;
+    const deData = seriesTransform ? seriesTransform(de) : de;
+    const tcData = seriesTransform ? seriesTransform(tc) : tc;
+
+    return ngData.map((p, i) => ({
       fecha: p.fecha,
       label: formatFechaCorta(p.fecha),
       nivelGeneral: p.valor,
-      desestacionalizada: de[i]?.valor ?? null,
-      tendenciaCiclo: tc[i]?.valor ?? null,
+      desestacionalizada: deData[i]?.valor ?? null,
+      tendenciaCiclo: tcData[i]?.valor ?? null,
     }));
-  }, [filteredFechas, data]);
+  }, [filteredFechas, data, vistaMode]);
+
+  const yDomain = useMemo(() => {
+    const visibleKeys = SERIES.filter((s) => seriesVisibles.has(s.key)).map((s) => s.key as keyof typeof chartData[number]);
+    const values: number[] = [];
+
+    chartData.forEach((row) => {
+      visibleKeys.forEach((key) => {
+        const value = row[key];
+        if (typeof value === 'number' && !Number.isNaN(value)) {
+          values.push(value);
+        }
+      });
+    });
+
+    if (!values.length) return ['auto', 'auto'] as ['auto', 'auto'];
+
+    let min = Math.min(...values);
+    let max = Math.max(...values);
+
+    if (vistaMode !== 'niveles') {
+      min = Math.min(min, 0);
+      max = Math.max(max, 0);
+    }
+
+    if (min === max) {
+      const pad = Math.abs(min) * 0.1 || 1;
+      return [min - pad, max + pad] as [number, number];
+    }
+
+    const pad = (max - min) * (vistaMode === 'niveles' ? 0.08 : 0.12);
+    return [min - pad, max + pad] as [number, number];
+  }, [chartData, seriesVisibles, vistaMode]);
 
   const toggleSerie = (key: string) => {
     setSeriesVisibles((prev) => {
@@ -100,7 +145,7 @@ export default function IpiSeriesAreaChart({ data }: Props) {
             <span style={{ color: '#64748b' }}>
               {SERIES.find((s) => s.key === entry.dataKey)?.nombre}:
             </span>{' '}
-            <strong>{formatIndice(entry.value)}</strong>
+            <strong>{vistaMode === 'niveles' ? formatIndice(entry.value) : formatVariacion(entry.value)}</strong>
           </div>
         ))}
       </div>
@@ -186,45 +231,78 @@ export default function IpiSeriesAreaChart({ data }: Props) {
       </div>
 
       <ResponsiveContainer width="100%" height={320}>
-        <AreaChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
-          <defs>
-            {SERIES.map((s) => (
-              <linearGradient key={s.key} id={`grad-${s.key}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={s.color} stopOpacity={0.25} />
-                <stop offset="95%" stopColor={s.color} stopOpacity={0.02} />
-              </linearGradient>
-            ))}
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-          <XAxis
-            dataKey="label"
-            tick={{ fill: '#64748b', fontSize: 11 }}
-            axisLine={false}
-            tickLine={false}
-            interval="preserveStartEnd"
-          />
-          <YAxis
-            tick={{ fill: '#64748b', fontSize: 11 }}
-            axisLine={false}
-            tickLine={false}
-            width={50}
-            tickFormatter={(v) => formatIndice(v)}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          {SERIES.filter((s) => seriesVisibles.has(s.key)).map((s) => (
-            <Area
-              key={s.key}
-              type="monotone"
-              dataKey={s.key}
-              stroke={s.color}
-              strokeWidth={2.5}
-              fill={`url(#grad-${s.key})`}
-              dot={false}
-              activeDot={{ r: 4, fill: s.color }}
-              connectNulls
+        {vistaMode === 'niveles' ? (
+          <AreaChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
+            <defs>
+              {SERIES.map((s) => (
+                <linearGradient key={s.key} id={`grad-${s.key}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={s.color} stopOpacity={0.25} />
+                  <stop offset="95%" stopColor={s.color} stopOpacity={0.02} />
+                </linearGradient>
+              ))}
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+            <XAxis
+              dataKey="label"
+              tick={{ fill: '#64748b', fontSize: 11 }}
+              axisLine={false}
+              tickLine={false}
+              interval="preserveStartEnd"
             />
-          ))}
-        </AreaChart>
+            <YAxis
+              tick={{ fill: '#64748b', fontSize: 11 }}
+              axisLine={false}
+              tickLine={false}
+              width={50}
+              domain={yDomain}
+              tickFormatter={(v) => formatIndice(v)}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            {SERIES.filter((s) => seriesVisibles.has(s.key)).map((s) => (
+              <Area
+                key={s.key}
+                type="monotone"
+                dataKey={s.key}
+                stroke={s.color}
+                strokeWidth={2.5}
+                fill={`url(#grad-${s.key})`}
+                dot={false}
+                activeDot={{ r: 4, fill: s.color }}
+                connectNulls
+              />
+            ))}
+          </AreaChart>
+        ) : (
+          <BarChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+            <XAxis
+              dataKey="label"
+              tick={{ fill: '#64748b', fontSize: 11 }}
+              axisLine={false}
+              tickLine={false}
+              interval="preserveStartEnd"
+            />
+            <YAxis
+              tick={{ fill: '#64748b', fontSize: 11 }}
+              axisLine={false}
+              tickLine={false}
+              width={50}
+              domain={yDomain}
+              tickFormatter={(v) => `${v}%`}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <ReferenceLine y={0} stroke="#334155" strokeWidth={1.2} />
+            {SERIES.filter((s) => seriesVisibles.has(s.key)).map((s) => (
+              <Bar
+                key={s.key}
+                dataKey={s.key}
+                fill={s.color}
+                fillOpacity={0.85}
+                radius={[2, 2, 0, 0]}
+              />
+            ))}
+          </BarChart>
+        )}
       </ResponsiveContainer>
     </Card>
   );

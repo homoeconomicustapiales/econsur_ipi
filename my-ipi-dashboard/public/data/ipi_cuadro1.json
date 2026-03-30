@@ -1,0 +1,8 @@
+{
+  "nivelGeneral": [],
+  "desestacionalizada": [],
+  "tendenciaCiclo": [],
+  "periodoInicio": "2016-01",
+  "periodoFin": "2024-12",
+  "_nota": "Ejecutar scripts/processor.py con ipi_man.xls para generar datos reales"
+}

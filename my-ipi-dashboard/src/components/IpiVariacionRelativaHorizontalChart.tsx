@@ -10,6 +10,7 @@ import {
   Tooltip,
   ReferenceLine,
   Cell,
+  LabelList,
   ResponsiveContainer,
 } from 'recharts';
 import { formatVariacion } from '@/utils/formatters';
@@ -26,6 +27,12 @@ const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'O
 function formatFechaOpt(f: string): string {
   const [y, m] = f.split('-').map(Number);
   return `${MESES[m - 1]} ${y}`;
+}
+
+function formatVariacionEntera(valor: number): string {
+  const redondeado = Math.round(valor);
+  const signo = redondeado > 0 ? '+' : '';
+  return `${signo}${redondeado}%`;
 }
 
 export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
@@ -82,6 +89,27 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
           {label}
         </text>
       </g>
+    );
+  };
+
+  const CustomBarLabel = ({ x, y, width, height, value }: any) => {
+    if (typeof value !== 'number' || Number.isNaN(value)) return null;
+
+    const isPositive = value >= 0;
+    const labelX = isPositive ? x + width + 6 : x - 6;
+
+    return (
+      <text
+        x={labelX}
+        y={y + height / 2}
+        dy={4}
+        textAnchor={isPositive ? 'start' : 'end'}
+        fill={isPositive ? '#16a34a' : '#dc2626'}
+        fontSize={11}
+        fontWeight={700}
+      >
+        {formatVariacionEntera(value)}
+      </text>
     );
   };
 
@@ -165,6 +193,7 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
                 fillOpacity={0.85}
               />
             ))}
+            <LabelList dataKey="variacion" content={<CustomBarLabel />} />
           </Bar>
         </BarChart>
       </ResponsiveContainer>

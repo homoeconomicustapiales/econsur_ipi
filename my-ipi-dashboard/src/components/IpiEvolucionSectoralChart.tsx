@@ -51,6 +51,33 @@ export default function IpiEvolucionSectoralChart({ data }: Props) {
     });
   }, [fechaBase, data, sectores, todasFechas, fechasFiltradas]);
 
+  const yDomain = useMemo(() => {
+    const values: number[] = [];
+
+    chartData.forEach((row) => {
+      sectores.forEach((sector) => {
+        if (!seriesVisibles.has(sector)) return;
+        const value = row[sector];
+        if (typeof value === 'number' && !Number.isNaN(value)) {
+          values.push(value);
+        }
+      });
+    });
+
+    if (!values.length) return ['auto', 'auto'] as ['auto', 'auto'];
+
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+
+    if (min === max) {
+      const pad = Math.abs(min) * 0.1 || 1;
+      return [min - pad, max + pad] as [number, number];
+    }
+
+    const pad = (max - min) * 0.08;
+    return [min - pad, max + pad] as [number, number];
+  }, [chartData, sectores, seriesVisibles]);
+
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload?.length) return null;
     const visible = payload.filter((p: any) => p.value !== null).slice(0, 6);
@@ -127,7 +154,7 @@ export default function IpiEvolucionSectoralChart({ data }: Props) {
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis dataKey="label" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-          <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} width={50} tickFormatter={(v) => formatIndice(v)} />
+          <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} width={50} domain={yDomain} tickFormatter={(v) => formatIndice(v)} />
           <Tooltip content={<CustomTooltip />} />
           {sectores.filter((s) => seriesVisibles.has(s)).map((s, i) => {
             const idx = sectores.indexOf(s);

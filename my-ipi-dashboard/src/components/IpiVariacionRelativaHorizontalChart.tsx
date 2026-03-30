@@ -68,6 +68,8 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
     }));
   }, [desde, hasta, data]);
 
+  const chartHeight = Math.max(500, chartData.length * 28);
+
   const CustomTooltip = ({ active, payload }: any) => {
     if (!active || !payload?.length) return null;
     const v = payload[0].value;
@@ -175,7 +177,7 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={500}>
+      <ResponsiveContainer width="100%" height={chartHeight}>
         <BarChart
           data={chartData}
           layout="vertical"
@@ -196,6 +198,7 @@ export default function IpiVariacionRelativaHorizontalChart({ data }: Props) {
             axisLine={false}
             tickLine={false}
             width={155}
+            interval={0}
           />
           <Tooltip content={<CustomTooltip />} />
           <ReferenceLine x={0} stroke="#475569" strokeWidth={1.5} />

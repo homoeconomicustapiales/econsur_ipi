@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    # Evitamos que este workflow se dispare si solo cambias el Excel, 
+    # queremos que espere a que el robot genere los JSON.
+    paths-ignore:
+      - 'my-ipi-dashboard/data/raw/**'
   workflow_dispatch:
 
 jobs:
@@ -18,7 +22,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: my-ipi-dashboard/package-lock.json
+          cache-dependency-path: '**/my-ipi-dashboard/package-lock.json'
 
       - name: Install dependencies
         working-directory: my-ipi-dashboard
@@ -36,3 +40,4 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: my-ipi-dashboard
           vercel-args: '--prod'
+          

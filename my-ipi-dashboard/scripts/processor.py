@@ -2,13 +2,13 @@
 """
 processor.py
 ============
-Procesa el archivo ipi_man.xls del INDEC y genera dos archivos JSON:
+Procesa el archivo ipi_man.xlsx del INDEC y genera dos archivos JSON:
   - ../data/processed/ipi_cuadro1.json  (3 series principales)
   - ../data/processed/ipi_cuadro2.json  (17 series sectoriales)
 
 Uso:
     cd my-ipi-dashboard/scripts
-    python processor.py [--input ../data/raw/ipi_man.xls]
+    python processor.py [--input ../data/raw/ipi_man.xlsx]
 """
 
 import json
@@ -194,11 +194,11 @@ def validar_datos(datos: dict, nombre: str) -> bool:
 # ──────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="Procesa ipi_man.xls → JSONs")
+    parser = argparse.ArgumentParser(description="Procesa ipi_man.xlsx → JSONs")
     parser.add_argument(
         "--input",
-        default=str(Path(__file__).parent.parent / "data" / "raw" / "ipi_man.xls"),
-        help="Ruta al archivo ipi_man.xls",
+        default=str(Path(__file__).parent.parent / "data" / "raw" / "ipi_man.xlsx"),
+        help="Ruta al archivo ipi_man.xlsx",
     )
     parser.add_argument(
         "--output-dir",
@@ -217,7 +217,7 @@ def main():
 
     if not input_path.exists():
         print(f"\n  ERROR: No se encontró el archivo '{input_path}'")
-        print("  Copiá ipi_man.xls a my-ipi-dashboard/data/raw/")
+        print("  Copiá ipi_man.xlsx a my-ipi-dashboard/data/raw/")
         sys.exit(1)
 
     output_dir.mkdir(parents=True, exist_ok=True)

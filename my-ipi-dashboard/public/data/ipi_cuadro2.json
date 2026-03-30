@@ -1,19 +1,104 @@
 {
-  "ipiManufacturero": [],
-  "alimentosBebidas": [],
-  "tabaco": [],
-  "textiles": [],
-  "prendasCueroCalzado": [],
-  "maderaPapel": [],
-  "petroleo": [],
-  "quimicos": [],
-  "cauchoPlastico": [],
-  "mineralesNoMetalicos": [],
-  "metalicasBasicas": [],
-  "productosMetal": [],
-  "maquinariaEquipo": [],
-  "otrosEquipos": [],
-  "vehiculosAutomotores": [],
-  "otroTransporte": [],
-  "muebles": []
+  "ipiManufacturero": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "alimentosBebidas": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "tabaco": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "textiles": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "prendasCueroCalzado": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "maderaPapel": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "petroleo": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "quimicos": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "cauchoPlastico": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "mineralesNoMetalicos": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "metalicasBasicas": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "productosMetal": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "maquinariaEquipo": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "otrosEquipos": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "vehiculosAutomotores": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "otroTransporte": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "muebles": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ]
 }

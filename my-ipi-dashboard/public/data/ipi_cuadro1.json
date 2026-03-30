@@ -1,7 +1,22 @@
 {
-  "nivelGeneral": [],
-  "desestacionalizada": [],
-  "tendenciaCiclo": [],
-  "periodoInicio": "N/A",
-  "periodoFin": "N/A"
+  "nivelGeneral": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "desestacionalizada": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "tendenciaCiclo": [
+    {
+      "fecha": "2004-01",
+      "valor": NaN
+    }
+  ],
+  "periodoInicio": "2004-01",
+  "periodoFin": "2004-01"
 }

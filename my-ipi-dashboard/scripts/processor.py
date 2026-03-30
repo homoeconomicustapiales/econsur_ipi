@@ -7,101 +7,86 @@ from pathlib import Path
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-# --- CONFIGURACIÓN DE COLUMNAS ---
-# Basado en tu estructura: Columna D es índice 3
+# --- CONFIGURACIÓN ESTRICTA ---
+# fila_inicio: Es el índice de Pandas (Fila Excel - 1)
+# Cuadro 1: Fila 9 -> índice 8
+# Cuadro 2: Fila 7 -> índice 6
 CUADRO1_CONFIG = {
     "hoja": "Cuadro 1",
-    "columna_test": 3,  # Usamos Nivel General para saber si hay datos
+    "fila_inicio": 8, 
     "series": {
-        "nivelGeneral": 3,
-        "desestacionalizada": 7,
-        "tendenciaCiclo": 10,
+        "nivelGeneral": 3,      # Columna D
+        "desestacionalizada": 7, # Columna H
+        "tendenciaCiclo": 10,   # Columna K
     },
 }
 
 CUADRO2_CONFIG = {
     "hoja": "Cuadro 2",
-    "columna_test": 3,  # Usamos IPI Manufacturero para saber si hay datos
+    "fila_inicio": 6,
     "series": {
-        "ipiManufacturero": 3,
-        "alimentosBebidas": 4,
-        "tabaco": 18,
-        "textiles": 21,
-        "prendasCueroCalzado": 26,
-        "maderaPapel": 30,
-        "petroleo": 34,
-        "quimicos": 40,
-        "cauchoPlastico": 49,
-        "mineralesNoMetalicos": 53,
-        "metalicasBasicas": 60,
-        "productosMetal": 64,
-        "maquinariaEquipo": 68,
-        "otrosEquipos": 73,
-        "vehiculosAutomotores": 77,
-        "otroTransporte": 81,
-        "muebles": 84,
+        "ipiManufacturero": 3,         # D
+        "alimentosBebidas": 4,         # E
+        "tabaco": 18,                  # S
+        "textiles": 21,                # V
+        "prendasCueroCalzado": 26,     # AA
+        "maderaPapel": 30,             # AE
+        "petroleo": 34,                # AI
+        "quimicos": 40,                # AO
+        "cauchoPlastico": 49,          # AX
+        "mineralesNoMetalicos": 53,    # BB
+        "metalicasBasicas": 60,        # BI
+        "productosMetal": 64,          # BM
+        "maquinariaEquipo": 68,        # BQ
+        "otrosEquipos": 73,            # BV
+        "vehiculosAutomotores": 77,    # BZ
+        "otroTransporte": 81,          # CD
+        "muebles": 84,                 # CG
     },
 }
 
 def procesar_hoja(df, config):
     """
-    Busca el bloque de datos y genera fechas desde Enero 2016.
+    Ignora las fechas del Excel. Genera cronología desde Enero 2016 
+    empezando en la fila exacta definida.
     """
     resultado = {k: [] for k in config["series"]}
-    fecha_actual = datetime(2016, 1, 1) # Inicio forzado
-    encontro_bloque_datos = False
+    fecha_cursor = datetime(2016, 1, 1) # Inicio obligatorio
+    fila_actual = config["fila_inicio"]
     conteo = 0
 
-    for i in range(len(df)):
+    # Iteramos desde la fila de inicio hasta el final del dataframe
+    for i in range(fila_actual, len(df)):
         fila = df.iloc[i]
-        val_test = fila.iloc[config["columna_test"]]
-
-        # Intentamos convertir el valor de prueba a float
+        
+        # Verificamos si la celda de la primera serie tiene un número
+        # Si está vacía o no es un número, asumimos que terminó la tabla
+        val_test = fila.iloc[list(config["series"].values())[0]]
+        
         try:
-            # Si el valor es nulo o no es un número real, lo ignoramos
-            if pd.isna(val_test) or isinstance(val_test, str):
-                if not encontro_bloque_datos:
-                    continue # Seguimos buscando el inicio
-                else:
-                    # Si ya veníamos leyendo y encontramos algo no numérico,
-                    # revisamos si es un salto pequeño o el fin de la tabla
-                    if conteo > 10: # Si ya leímos mucho, es el fin
-                        break
-                    else:
-                        continue
-            
-            valor_num = float(val_test)
-            # El INDEC suele tener años como 2016, 2017 en las primeras filas.
-            # Los números del IPI suelen ser cercanos a 100. 
-            # Si el número es exactamente el año, lo saltamos.
-            if not encontro_bloque_datos and (valor_num > 2000 and valor_num < 2030):
-                continue
-
-            encontro_bloque_datos = True
-        except (ValueError, TypeError):
-            if not encontro_bloque_datos:
-                continue
-            else:
+            if pd.isna(val_test):
                 break
+            float(val_test) # Validamos que sea numérico
+        except (ValueError, TypeError):
+            break
 
-        # Si llegamos aquí, tenemos un dato válido y estamos en el bloque
-        fecha_str = fecha_actual.strftime("%Y-%m")
+        fecha_str = fecha_cursor.strftime("%Y-%m")
 
+        # Extraemos los datos de las columnas configuradas
         for nombre_serie, col_idx in config["series"].items():
             try:
                 val = fila.iloc[col_idx]
-                # Limpieza de datos: manejar errores de texto en celdas numéricas
                 valor = round(float(val), 4) if pd.notna(val) else None
             except:
                 valor = None
             
             resultado[nombre_serie].append({"fecha": fecha_str, "valor": valor})
         
-        fecha_actual += relativedelta(months=1)
+        # Incrementamos un mes y pasamos a la siguiente fila
+        fecha_cursor += relativedelta(months=1)
         conteo += 1
     
-    print(f"  -> Bloque detectado. Procesados {conteo} meses desde 2016-01.")
-    return resultado
+    return resultado, conteo
 
 def main():
     parser = argparse.ArgumentParser()
@@ -113,46 +98,46 @@ def main():
     input_path = Path(args.input)
     output_dir = Path(args.output_dir)
 
-    print(f"\n--- PROCESADOR IPI (FIX: START JAN 2016) ---")
+    print(f"\n--- PROCESAMIENTO IPI (INICIO ENE-2016) ---")
 
     if not input_path.exists():
-        print(f"ERROR: No existe {input_path}")
+        print(f"ERROR: No se encuentra {input_path}")
         sys.exit(1)
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        # Usamos openpyxl para leer el archivo Excel
         with pd.ExcelFile(input_path, engine='openpyxl') as xls:
             
             # --- CUADRO 1 ---
-            print(f"\nAnalizando {CUADRO1_CONFIG['hoja']}...")
+            print(f"Procesando {CUADRO1_CONFIG['hoja']} (desde fila 9)...")
             df1 = pd.read_excel(xls, sheet_name=CUADRO1_CONFIG["hoja"], header=None)
-            c1_data = procesar_hoja(df1, CUADRO1_CONFIG)
+            data1, n1 = procesar_hoja(df1, CUADRO1_CONFIG)
             
-            fechas = [p["fecha"] for s in c1_data.values() for p in s if p["valor"] is not None]
             c1_final = {
-                **c1_data,
+                **data1,
                 "periodoInicio": "2016-01",
-                "periodoFin": max(fechas) if fechas else "N/A"
+                "periodoFin": (datetime(2016,1,1) + relativedelta(months=n1-1)).strftime("%Y-%m") if n1 > 0 else "N/A"
             }
             
             with open(output_dir / "ipi_cuadro1.json", "w", encoding="utf-8") as f:
                 json.dump(c1_final, f, ensure_ascii=False, indent=2)
+            print(f"  -> OK: {n1} meses generados.")
 
             # --- CUADRO 2 ---
-            print(f"\nAnalizando {CUADRO2_CONFIG['hoja']}...")
+            print(f"Procesando {CUADRO2_CONFIG['hoja']} (desde fila 7)...")
             df2 = pd.read_excel(xls, sheet_name=CUADRO2_CONFIG["hoja"], header=None)
-            c2_data = procesar_hoja(df2, CUADRO2_CONFIG)
+            data2, n2 = procesar_hoja(df2, CUADRO2_CONFIG)
             
             with open(output_dir / "ipi_cuadro2.json", "w", encoding="utf-8") as f:
-                json.dump(c2_data, f, ensure_ascii=False, indent=2)
+                json.dump(data2, f, ensure_ascii=False, indent=2)
+            print(f"  -> OK: {n2} meses generados.")
 
     except Exception as e:
-        print(f"ERROR CRÍTICO: {e}")
+        print(f"ERROR: {e}")
         sys.exit(1)
 
-    print(f"\n--- PROCESO FINALIZADO ---")
+    print(f"--- PROCESO FINALIZADO ---")
 
 if __name__ == "__main__":
     main()

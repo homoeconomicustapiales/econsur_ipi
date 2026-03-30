@@ -26,6 +26,12 @@ export default function IpiEvolucionSectoralChart({ data }: Props) {
   const [fechaBase, setFechaBase] = useState('2016-01');
   const [seriesVisibles, setSeriesVisibles] = useState<Set<string>>(new Set(sectores));
 
+  const fechasFiltradas = useMemo(() => {
+    const baseIdx = todasFechas.findIndex((f) => f === fechaBase);
+    if (baseIdx < 0) return todasFechas;
+    return todasFechas.slice(baseIdx);
+  }, [todasFechas, fechaBase]);
+
   const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
   const formatFechaOpt = (f: string) => {
     const [y, m] = f.split('-').map(Number);
@@ -37,12 +43,13 @@ export default function IpiEvolucionSectoralChart({ data }: Props) {
     sectores.forEach((s) => {
       rebased[s] = rebaseASerie(data[s], fechaBase);
     });
-    return todasFechas.map((fecha, i) => {
+    return fechasFiltradas.map((fecha) => {
+      const i = todasFechas.indexOf(fecha);
       const row: Record<string, any> = { fecha, label: formatFechaCorta(fecha) };
       sectores.forEach((s) => { row[s] = rebased[s][i]?.valor ?? null; });
       return row;
     });
-  }, [fechaBase, data, sectores, todasFechas]);
+  }, [fechaBase, data, sectores, todasFechas, fechasFiltradas]);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload?.length) return null;
@@ -81,6 +88,12 @@ export default function IpiEvolucionSectoralChart({ data }: Props) {
               <option key={f} value={f}>{formatFechaOpt(f)}</option>
             ))}
           </select>
+          <button
+            onClick={() => setSeriesVisibles(new Set(sectores))}
+            className="bg-transparent border border-slate-200 rounded-md text-slate-500 px-3 py-1 text-xs cursor-pointer font-semibold hover:border-blue-400 hover:text-blue-500 transition-colors"
+          >
+            LIMPIAR
+          </button>
         </div>
       </div>
 

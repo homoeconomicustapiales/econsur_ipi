@@ -45,7 +45,6 @@ export default function IpiSeriesAreaChart({ data }: Props) {
   );
 
   const fechas = data.nivelGeneral.map((p) => p.fecha);
-  const ultimaFecha = fechas[fechas.length - 1];
 
   const filteredFechas = useMemo(() => {
     const rango = RANGOS.find((r) => r.label === rangoActivo);
@@ -58,10 +57,6 @@ export default function IpiSeriesAreaChart({ data }: Props) {
     const desde = filteredFechas[0];
     const hasta = filteredFechas[filteredFechas.length - 1];
 
-    const ng = filterByDateRange(data.nivelGeneral, desde, hasta);
-    const de = filterByDateRange(data.desestacionalizada, desde, hasta);
-    const tc = filterByDateRange(data.tendenciaCiclo, desde, hasta);
-
     const seriesTransform =
       vistaMode === 'mensual'
         ? calcVariacionMensual
@@ -69,9 +64,15 @@ export default function IpiSeriesAreaChart({ data }: Props) {
         ? calcVariacionInteranual
         : null;
 
-    const ngData = seriesTransform ? seriesTransform(ng) : ng;
-    const deData = seriesTransform ? seriesTransform(de) : de;
-    const tcData = seriesTransform ? seriesTransform(tc) : tc;
+    // Para variaciones, primero se calcula sobre la serie completa y luego se filtra,
+    // así el primer punto del rango conserva la comparación contra el período previo.
+    const ngBase = seriesTransform ? seriesTransform(data.nivelGeneral) : data.nivelGeneral;
+    const deBase = seriesTransform ? seriesTransform(data.desestacionalizada) : data.desestacionalizada;
+    const tcBase = seriesTransform ? seriesTransform(data.tendenciaCiclo) : data.tendenciaCiclo;
+
+    const ngData = filterByDateRange(ngBase, desde, hasta);
+    const deData = filterByDateRange(deBase, desde, hasta);
+    const tcData = filterByDateRange(tcBase, desde, hasta);
 
     return ngData.map((p, i) => ({
       fecha: p.fecha,
@@ -286,9 +287,16 @@ export default function IpiSeriesAreaChart({ data }: Props) {
               tick={{ fill: '#64748b', fontSize: 11 }}
               axisLine={false}
               tickLine={false}
-              width={50}
+              width={72}
               domain={yDomain}
-              tickFormatter={(v) => `${v}%`}
+              tickFormatter={(v) =>
+                typeof v === 'number'
+                  ? `${v.toLocaleString('es-AR', {
+                      minimumFractionDigits: 1,
+                      maximumFractionDigits: 1,
+                    })}%`
+                  : ''
+              }
             />
             <Tooltip content={<CustomTooltip />} />
             <ReferenceLine y={0} stroke="#334155" strokeWidth={1.2} />

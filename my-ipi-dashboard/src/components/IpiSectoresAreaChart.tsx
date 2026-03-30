@@ -104,8 +104,7 @@ export default function IpiSectoresAreaChart({ data }: Props) {
             onDesdeChange={setDesde}
             onHastaChange={setHasta}
             onLimpiar={() => {
-              setDesde(primeraFecha);
-              setHasta(ultimaFecha);
+              setSeriesVisibles(new Set(sectores));
             }}
           />
           <AxisScaleSelector

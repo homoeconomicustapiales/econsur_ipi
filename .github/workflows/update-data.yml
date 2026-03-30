@@ -1,0 +1,57 @@
+name: Update IPI Data
+
+on:
+  # Se dispara automáticamente cuando se sube un nuevo ipi_man.xls al repositorio
+  push:
+    paths:
+      - 'my-ipi-dashboard/data/raw/ipi_man.xls'
+  # También se puede disparar manualmente desde GitHub Actions
+  workflow_dispatch:
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verificar que ipi_man.xls existe en el repositorio
+        working-directory: my-ipi-dashboard
+        run: |
+          if [ ! -f "data/raw/ipi_man.xls" ]; then
+            echo "ERROR: No se encontró data/raw/ipi_man.xls"
+            echo "Subí el archivo manualmente al repositorio antes de ejecutar este workflow."
+            exit 1
+          fi
+          echo "✓ Archivo encontrado: $(ls -lh data/raw/ipi_man.xls)"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        working-directory: my-ipi-dashboard/scripts
+        run: pip install -r requirements.txt
+
+      - name: Process data
+        working-directory: my-ipi-dashboard/scripts
+        run: python processor.py
+
+      - name: Copy JSONs to public folder
+        working-directory: my-ipi-dashboard
+        run: |
+          mkdir -p public/data
+          cp data/processed/ipi_cuadro1.json public/data/
+          cp data/processed/ipi_cuadro2.json public/data/
+
+      - name: Commit and push if data changed
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add my-ipi-dashboard/data/processed/
+          git add my-ipi-dashboard/public/data/
+          git diff --staged --quiet || git commit -m "chore: actualizar datos IPI [$(date +'%Y-%m')]"
+          git push
